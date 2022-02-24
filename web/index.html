@@ -36,22 +36,37 @@
             </div>  
             <div class="row">
                 <div class="col">
-                    <form id="transactionForm" onsubmit="transactionFormSubmit()">
+                    <form id="transactionForm">
                         <div class="form-group">
                             <label for="from">From: </label>
                             <input type="text" class="form-control" id="from" placeholder="Enter From address">                    
                         </div>
+                        
                         <div class="form-group">
                             <label for="to">To:</label>
-                            <select class="form-control" id="to">
-                            </select>
-                            <!-- <input type="text" class="form-control" id="to" placeholder="Enter To address"> -->
+
+                            <input type="text" class="form-control" id="to" placeholder="Enter To address">
+
+                            <!-- <div class="row">
+                                <div class="col">
+                                    <select class="form-control" id="to">
+                                    </select>
+                                    
+                                </div>
+                                <div class="col-sm">
+                                    Or
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" id="toAddress" placeholder="Enter To address if you haven't selected address from combo box">
+                                </div>
+                            </div> -->
+                                                                           
                         </div>
                         <div class="form-group">
                             <label for="amount">Amount (eth):</label>
                             <input type="text" class="form-control" id="amount" placeholder="Enter To amount">
                         </div>
-                        <button type="submit" class="btn btn-primary">Send</button>
+                        <button id="send" class="btn btn-primary">Send</button>
                     </form>
                     <label id="message"></label>
                 </div>                
@@ -68,7 +83,7 @@
     <script>
 
         const contractAddress = '0xFA59663bc7C99cB150994dA63b5038230b4548A2';
-
+        
         if (typeof web3 != 'undefined') {
 
             console.log('web3 defined');
@@ -92,7 +107,6 @@
         var accountsArray = [];
 
         $(document).ready(function () {
-            
             web3.eth.getAccounts(async function(error, accounts) {
 
                 if (error == null && accounts.length > 0) {
@@ -103,22 +117,28 @@
                     
                     console.log('accountsArray', accountsArray)
 
-                    for(let i=1; i<accountsArray.length; i++) {
-                        $("#to").append(
-                            `<option value="${accountsArray[i]}">${accountsArray[i]}</option>`
-                        );            
-                    }
+                    // for(let i=1; i<accountsArray.length; i++) {
+                    //     $("#to").append(
+                    //         `<option value="${accountsArray[i]}">${accountsArray[i]}</option>`
+                    //     );            
+                    // }
                 } else {
                     console.log('No accounts');
                 }
             });            
-            
+
             $("#from").val(fromAddress);
-            $("#currentAccount").html(fromAddress);                      
+            $("#currentAccount").html(fromAddress);
+
+            $("#send").click(transactionFormSubmit);
+                                  
         });
 
-        function transactionFormSubmit() {
+       
 
+        function transactionFormSubmit(event) {
+            event.preventDefault();
+            
             var fromAddress = $("#from").val();
             var to = $("#to").val();
             var amount = web3.utils.toWei($("#amount").val());
