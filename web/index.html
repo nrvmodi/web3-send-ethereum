@@ -145,7 +145,7 @@
 
             approvalContract.methods.deposit(toAddress).send( {from: fromAddress, gas: 1000000, value: amount}, function (error,result){
                 if (error)   {
-                    $("#message").html("Error while sending balance: " + error);
+                    $("#message").html("Error while sending balance: " + error['message']);
                     console.error('Error while sending balance', error);
                 } else{
                     $("#message").html("Transaction successful. Transaction id: " + result);

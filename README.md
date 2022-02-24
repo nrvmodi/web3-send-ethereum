@@ -1,6 +1,8 @@
 # web3-send-ethereum
 This project is based on web3 js.
 
+![Application](app1.png)
+
 ### Start local ethereum environment using below command
 
 `truffle develop`
