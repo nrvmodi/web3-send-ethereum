@@ -17,10 +17,16 @@
     <body>
 
         <div class="container">
+
+            <h1>Welcome to explore ethereum network course</h1>
             
             <div class="row">
                 <div class="col">
-                    <div class="form-group"></div>
+                    <div class="form-group">
+
+                        <button id="connectAccount" class="btn btn-primary">Connect Account</button>
+
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -131,10 +137,16 @@
             $("#currentAccount").html(fromAddress);
 
             $("#send").click(transactionFormSubmit);
+            $("#connectAccount").click(connectAccount);
                                   
         });
 
-       
+        function connectAccount(event) {
+            event.preventDefault();
+
+            eth.requestAccounts().then(console.log('Requested accounts.'));
+            
+        }
 
         function transactionFormSubmit(event) {
             event.preventDefault();
