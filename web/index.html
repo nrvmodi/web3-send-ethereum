@@ -1,0 +1,157 @@
+<html>
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    </head>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="contractAbi.js"></script>
+
+    <body>
+
+        <div class="container">
+            
+            <div class="row">
+                <div class="col">
+                    <div class="form-group"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label><strong>Current Account: </strong> </label>
+                        <label id="currentAccount"></label>
+                    </div>
+                </div>
+            </div>  
+            <div class="row">
+                <div class="col">
+                    <form id="transactionForm" onsubmit="transactionFormSubmit()">
+                        <div class="form-group">
+                            <label for="from">From: </label>
+                            <input type="text" class="form-control" id="from" placeholder="Enter From address">                    
+                        </div>
+                        <div class="form-group">
+                            <label for="to">To:</label>
+                            <select class="form-control" id="to">
+                            </select>
+                            <!-- <input type="text" class="form-control" id="to" placeholder="Enter To address"> -->
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount (eth):</label>
+                            <input type="text" class="form-control" id="amount" placeholder="Enter To amount">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
+                    <label id="message"></label>
+                </div>                
+            </div> 
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-primary" onclick="getBalance()">Get Balance</button>
+                    <label id="balance"></label>                    
+                </div>                
+            </div>            
+        </div>        
+    </body>
+
+    <script>
+
+        const contractAddress = '0xFA59663bc7C99cB150994dA63b5038230b4548A2';
+
+        if (typeof web3 != 'undefined') {
+
+            console.log('web3 defined');
+
+            web3 = new Web3(Web3.givenProvider);
+        } else {
+
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:9545"));
+        }
+
+        console.log('Web3 Version: ',web3.version);
+
+        var approvalContract = new web3.eth.Contract(abi, contractAddress);
+
+        console.log('Approval Contract: ', approvalContract);
+
+        const eth = web3.eth;
+
+        var toAddress = '0x057d2f4e8ccaab0523ec81c0e5b4d954e73bd907';
+        var fromAddress = '0x30F3367b0EC1e42464adf93C90b52E241934cB67';
+        var accountsArray = [];
+
+        $(document).ready(function () {
+            
+            web3.eth.getAccounts(async function(error, accounts) {
+
+                if (error == null && accounts.length > 0) {
+                    console.log('Accounts: ', accounts);
+                    
+                    accountsArray = accounts;
+                    fromAddress = accounts[0];
+                    
+                    console.log('accountsArray', accountsArray)
+
+                    for(let i=1; i<accountsArray.length; i++) {
+                        $("#to").append(
+                            `<option value="${accountsArray[i]}">${accountsArray[i]}</option>`
+                        );            
+                    }
+                } else {
+                    console.log('No accounts');
+                }
+            });            
+            
+            $("#from").val(fromAddress);
+            $("#currentAccount").html(fromAddress);                      
+        });
+
+        function transactionFormSubmit() {
+
+            var fromAddress = $("#from").val();
+            var to = $("#to").val();
+            var amount = web3.utils.toWei($("#amount").val());
+
+            approvalContract.methods.deposit(toAddress).send( {from: fromAddress, gas: 1000000, value: amount}, function (error,result){
+                if (error)   {
+                    $("#message").html("Error while sending balance: " + error);
+                    console.error('Error while sending balance', error);
+                } else{
+                    $("#message").html("Transaction successful. Transaction id: " + result);
+                    console.log('Transaction id: ', result);
+                }
+            });
+        }
+
+        function getBalance() {
+        
+            var fromAddress = $("#from").val();
+
+            eth.getBalance(fromAddress, function(error,result) {
+                if(error)   {
+                    $("#balance").html("Error while getting balance: " + error);
+                    console.error('Error while getting balance', error);
+                } else{
+                    $("#balance").html("Balance: " + web3.utils.fromWei(result));
+                    console.log('Balance: ', web3.utils.fromWei(result));
+                }
+            });
+        }  
+        
+
+    </script>
+
+</html>
+
+
